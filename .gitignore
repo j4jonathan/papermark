@@ -61,4 +61,4 @@ lib/emails/marketing
 .trigger
 
 # changelog
-changelog
+changelog.env.production
