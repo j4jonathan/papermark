@@ -18,12 +18,12 @@ const nextConfig = {
         source: "/",
         destination: "/dashboard",
         permanent: false,
-        has: [
+        has: process.env.NEXT_PUBLIC_APP_BASE_HOST ? [
           {
             type: "host",
             value: process.env.NEXT_PUBLIC_APP_BASE_HOST,
           },
-        ],
+        ] : undefined,
       },
       {
         source: "/view/cm2xiaxzo000d147xszm9q72o",
@@ -118,12 +118,12 @@ const nextConfig = {
       },
       {
         source: "/services/:path*",
-        has: [
+        has: process.env.NEXT_PUBLIC_WEBHOOK_BASE_HOST ? [
           {
             type: "host",
             value: process.env.NEXT_PUBLIC_WEBHOOK_BASE_HOST,
           },
-        ],
+        ] : undefined,
         headers: [
           {
             key: "X-Robots-Tag",
