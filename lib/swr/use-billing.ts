@@ -89,22 +89,29 @@ export function usePlan({
   const teamInfo = useTeam();
   const teamId = teamInfo?.currentTeam?.id;
 
+  // Check for self-hosted mode
+  const isSelfHosted = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true";
+
   const {
     data: plan,
     error,
     mutate,
   } = useSWR<PlanResponse>(
-    teamId ? `/api/teams/${teamId}/billing/plan${withDiscount ? "?withDiscount=true" : ""}` : null,
+    teamId && !isSelfHosted ? `/api/teams/${teamId}/billing/plan${withDiscount ? "?withDiscount=true" : ""}` : null,
     fetcher,
   );
 
   // Parse the plan using the parsing function
   const parsedPlan = useMemo(() => {
+    // If self-hosted, return business plan with all features
+    if (isSelfHosted) {
+      return { plan: "business" as BasePlan, trial: null, old: false };
+    }
     if (!plan || !plan.plan) {
       return { plan: null, trial: null, old: false };
     }
     return parsePlan(plan.plan);
-  }, [plan]);
+  }, [plan, isSelfHosted]);
 
   return {
     plan: parsedPlan.plan ?? "free",
