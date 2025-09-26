@@ -8,27 +8,27 @@ import { redis } from "@/lib/redis";
 
 const ratelimit = {
   public: new Ratelimit({
-    redis,
+    redis: redis!,
     analytics: true,
     prefix: "ratelimit:public",
     // rate limit public to 3 request per hour
     limiter: Ratelimit.slidingWindow(3, "1h"),
   }),
   free: new Ratelimit({
-    redis,
+    redis: redis!,
     analytics: true,
     prefix: "ratelimit:free",
     // rate limit to 3 request per day
     limiter: Ratelimit.fixedWindow(3, "24h"),
   }),
   paid: new Ratelimit({
-    redis,
+    redis: redis!,
     analytics: true,
     prefix: "ratelimit:paid",
     limiter: Ratelimit.slidingWindow(60, "10s"),
   }),
   pro: new Ratelimit({
-    redis,
+    redis: redis!,
     analytics: true,
     prefix: "ratelimit:pro",
     // rate limit to 1000 request per 30 days

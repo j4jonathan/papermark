@@ -8,7 +8,7 @@ import { redis } from "@/lib/redis";
 export const rateLimiters = {
   // 3 auth attempts per hour per IP
   auth: new Ratelimit({
-    redis,
+    redis: redis!,
     limiter: Ratelimit.slidingWindow(3, "20 m"),
     prefix: "rl:auth",
     enableProtection: true,
@@ -17,7 +17,7 @@ export const rateLimiters = {
 
   // 5 billing operations per hour per IP
   billing: new Ratelimit({
-    redis,
+    redis: redis!,
     limiter: Ratelimit.slidingWindow(3, "30 m"),
     prefix: "rl:billing",
     enableProtection: true,
