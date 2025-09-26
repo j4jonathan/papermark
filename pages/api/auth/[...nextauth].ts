@@ -22,6 +22,7 @@ import { generateChecksum } from "@/lib/utils/generate-checksum";
 import { getIpAddress } from "@/lib/utils/ip";
 
 const VERCEL_DEPLOYMENT = !!process.env.VERCEL_URL;
+const IS_SELF_HOSTED = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true";
 
 function getMainDomainUrl(): string {
   if (process.env.NODE_ENV === "development") {
@@ -124,7 +125,7 @@ export const authOptions: NextAuthOptions = {
         path: "/",
         // When working on localhost, the cookie domain must be omitted entirely (https://stackoverflow.com/a/1188145)
         // For self-hosted, omit domain to allow cookies to work on any domain
-        domain: VERCEL_DEPLOYMENT && !process.env.NEXT_PUBLIC_IS_SELF_HOSTED ? ".papermark.com" : undefined,
+        domain: VERCEL_DEPLOYMENT && !IS_SELF_HOSTED ? ".papermark.com" : undefined,
         secure: VERCEL_DEPLOYMENT,
       },
     },
@@ -211,7 +212,7 @@ const getAuthOptions = (req: NextApiRequest): NextAuthOptions => {
         }
 
         // Skip blacklist check for self-hosted instances
-        if (!process.env.NEXT_PUBLIC_IS_SELF_HOSTED) {
+        if (!IS_SELF_HOSTED) {
           if (!user.email || (await isBlacklistedEmail(user.email))) {
             await identifyUser(user.email ?? user.id);
             await trackAnalytics({
