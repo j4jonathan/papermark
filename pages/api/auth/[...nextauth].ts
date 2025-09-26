@@ -200,34 +200,39 @@ const getAuthOptions = (req: NextApiRequest): NextAuthOptions => {
     callbacks: {
       ...authOptions.callbacks,
       signIn: async ({ user }) => {
-        if (!user.email || (await isBlacklistedEmail(user.email))) {
-          await identifyUser(user.email ?? user.id);
-          await trackAnalytics({
-            event: "User Sign In Attempted",
-            email: user.email ?? undefined,
-            userId: user.id,
-          });
-          return false;
+        // Skip blacklist check for self-hosted instances
+        if (!process.env.NEXT_PUBLIC_IS_SELF_HOSTED) {
+          if (!user.email || (await isBlacklistedEmail(user.email))) {
+            await identifyUser(user.email ?? user.id);
+            await trackAnalytics({
+              event: "User Sign In Attempted",
+              email: user.email ?? undefined,
+              userId: user.id,
+            });
+            return false;
+          }
         }
 
-        // Apply rate limiting for signin attempts
-        try {
-          if (req) {
-            const clientIP = getIpAddress(req.headers);
-            const rateLimitResult = await checkRateLimit(
-              rateLimiters.auth,
-              clientIP,
-            );
+        // Apply rate limiting for signin attempts (skip for self-hosted)
+        if (!process.env.NEXT_PUBLIC_IS_SELF_HOSTED) {
+          try {
+            if (req) {
+              const clientIP = getIpAddress(req.headers);
+              const rateLimitResult = await checkRateLimit(
+                rateLimiters.auth,
+                clientIP,
+              );
 
-            if (!rateLimitResult.success) {
-              log({
-                message: `Rate limit exceeded for IP ${clientIP} during signin attempt`,
-                type: "error",
-              });
-              return false; // Block the signin
+              if (!rateLimitResult.success) {
+                log({
+                  message: `Rate limit exceeded for IP ${clientIP} during signin attempt`,
+                  type: "error",
+                });
+                return false; // Block the signin
+              }
             }
-          }
-        } catch (error) {}
+          } catch (error) {}
+        }
 
         return true;
       },
