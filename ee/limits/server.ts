@@ -62,6 +62,9 @@ export async function getLimits({
   teamId: string;
   userId: string;
 }) {
+  // Check if self-hosted
+  const isSelfHosted = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true";
+
   const team = await prisma.team.findUnique({
     where: {
       id: teamId,
@@ -103,6 +106,25 @@ export async function getLimits({
     const isTrial = isTrialPlan(team.plan);
     const defaultLimits = planLimitsMap[basePlan];
 
+    // If self-hosted, return unlimited everything
+    if (isSelfHosted) {
+      return {
+        ...defaultLimits,
+        ...parsedData,
+        users: Infinity, // Unlimited users for self-hosted
+        links: Infinity,
+        documents: Infinity,
+        domains: Infinity,
+        datarooms: Infinity,
+        customDomainOnPro: true,
+        customDomainInDataroom: true,
+        conversationsInDataroom: true,
+        advancedLinkControlsOnPro: true,
+        watermarkOnBusiness: true,
+        usage: { documents: documentCount, links: linkCount, users: userCount },
+      };
+    }
+
     // Adjust limits based on the plan if they're at the default value
     if (isFreePlan(team.plan)) {
       return {
@@ -125,6 +147,23 @@ export async function getLimits({
       };
     }
   } catch (error) {
+    // If self-hosted, return unlimited everything even on error
+    if (isSelfHosted) {
+      return {
+        users: Infinity,
+        links: Infinity,
+        documents: Infinity,
+        domains: Infinity,
+        datarooms: Infinity,
+        customDomainOnPro: true,
+        customDomainInDataroom: true,
+        conversationsInDataroom: true,
+        advancedLinkControlsOnPro: true,
+        watermarkOnBusiness: true,
+        usage: { documents: documentCount, links: linkCount, users: userCount },
+      };
+    }
+
     // if no limits set or parsing fails, return default limits based on the plan
     const basePlan = getBasePlan(team.plan);
     const isTrial = isTrialPlan(team.plan);
