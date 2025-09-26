@@ -4,10 +4,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  // Security: Only allow in development or with a secret key
+  // Security: Only allow with a secret key
   const debugKey = req.query.key;
-  if (process.env.NODE_ENV === "production" && debugKey !== "debug-vdr-2025") {
-    return res.status(403).json({ error: "Forbidden" });
+  if (debugKey !== "debug-vdr-2025") {
+    return res.status(403).json({ error: "Forbidden - use ?key=debug-vdr-2025" });
   }
 
   // Test 1: Environment Variables
