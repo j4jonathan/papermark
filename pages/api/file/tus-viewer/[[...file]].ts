@@ -22,7 +22,7 @@ export const config = {
 };
 
 const locker = new RedisLocker({
-  redisClient: lockerRedisClient,
+  redisClient: lockerRedisClient!,
 });
 
 const tusServer = new Server({
