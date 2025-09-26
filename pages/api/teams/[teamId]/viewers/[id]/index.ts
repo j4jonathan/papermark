@@ -297,7 +297,7 @@ export default async function handle(
       };
 
       if (withDuration !== "true") {
-        await redis.set(cacheKey, JSON.stringify(formattedViews), { ex: 600 }); // 10 min cache
+        await redis!.set(cacheKey, JSON.stringify(formattedViews), { ex: 600 }); // 10 min cache
       }
       res.setHeader('Cache-Control', 'public, s-maxage=30, stale-while-revalidate=300');
 

@@ -720,15 +720,15 @@ export async function POST(request: NextRequest) {
             flagCookieId = `pm_drs_flag_${link.slug}`;
           }
 
-          response.cookies.set(cookieId, newDataroomSession?.token, {
+          response.cookies.set(cookieId, newDataroomSession.token, {
             path: "/",
-            expires: new Date(newDataroomSession?.expiresAt),
+            expires: new Date(newDataroomSession.expiresAt),
             httpOnly: true,
             sameSite: "strict",
           });
           response.cookies.set(flagCookieId, "true", {
             path: basePath,
-            expires: new Date(newDataroomSession?.expiresAt),
+            expires: new Date(newDataroomSession.expiresAt),
             sameSite: "strict",
           });
         }
@@ -1030,15 +1030,15 @@ export async function POST(request: NextRequest) {
           flagCookieId = `pm_drs_flag_${link.slug}`;
         }
 
-        response.cookies.set(cookieId, newDataroomSession?.token, {
+        response.cookies.set(cookieId, newDataroomSession.token, {
           path: "/",
-          expires: new Date(newDataroomSession?.expiresAt),
+          expires: new Date(newDataroomSession.expiresAt),
           httpOnly: true,
           sameSite: "strict",
         });
         response.cookies.set(flagCookieId, "true", {
           path: basePath,
-          expires: new Date(newDataroomSession?.expiresAt),
+          expires: new Date(newDataroomSession.expiresAt),
           sameSite: "strict",
         });
       }

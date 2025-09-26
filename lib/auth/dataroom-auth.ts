@@ -35,7 +35,7 @@ async function createDataroomSession(
   ipAddress: string,
   verified: boolean,
   viewerId?: string,
-): Promise<{ token: string; expiresAt: number } | null> {
+): Promise<{ token: string; expiresAt: number }> {
   const sessionToken = crypto.randomBytes(32).toString("hex");
   const expiresAt = Date.now() + COOKIE_EXPIRATION_TIME;
 
