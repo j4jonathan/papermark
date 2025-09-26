@@ -40,6 +40,7 @@ export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === "development" || process.env.NEXTAUTH_DEBUG === "true",
   pages: {
     error: "/login",
+    signIn: "/login",
   },
   providers: [
     GoogleProvider({
@@ -203,11 +204,15 @@ const getAuthOptions = (req: NextApiRequest): NextAuthOptions => {
       ...authOptions.callbacks,
       signIn: async ({ user, account, profile }) => {
         // Debug logging for OAuth
-        if (process.env.NEXTAUTH_DEBUG === "true") {
+        if (process.env.NEXTAUTH_DEBUG === "true" || process.env.VERCEL) {
           console.log("[NextAuth] SignIn attempt:", {
             user: user?.email,
             provider: account?.provider,
             accountId: account?.providerAccountId,
+            hasUser: !!user,
+            hasAccount: !!account,
+            selfHosted: IS_SELF_HOSTED,
+            vercelDeployment: VERCEL_DEPLOYMENT,
           });
         }
 
@@ -248,7 +253,7 @@ const getAuthOptions = (req: NextApiRequest): NextAuthOptions => {
         }
 
         // Debug successful sign in
-        if (process.env.NEXTAUTH_DEBUG === "true") {
+        if (process.env.NEXTAUTH_DEBUG === "true" || process.env.VERCEL) {
           console.log("[NextAuth] SignIn successful for:", user?.email);
         }
         return true;
