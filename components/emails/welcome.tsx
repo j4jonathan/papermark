@@ -21,6 +21,8 @@ interface WelcomeEmailProps {
 }
 
 const WelcomeEmail = ({ name }: WelcomeEmailProps) => {
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Papermark";
+  const isCustomApp = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true";
   const previewText = `The document sharing infrastructure for the modern web`;
 
   return (
@@ -32,15 +34,17 @@ const WelcomeEmail = ({ name }: WelcomeEmailProps) => {
           <Container className="mx-auto my-10 w-[465px] p-5">
             <Text className="mx-0 mb-8 mt-4 p-0 text-center text-2xl font-normal">
               Welcome to{" "}
-              <span className="font-bold tracking-tighter">Papermark</span>
+              <span className="font-bold tracking-tighter">{appName}</span>
             </Text>
             <Text className="text-sm">
               Thanks for signing up{name && `, ${name}`}!
             </Text>
             <Text className="text-sm">
-              My name is Marc, and I&apos;m the founder of Papermark – the
-              secure way to share documents and data rooms. I&apos;m excited to
-              have you on board!
+              {isCustomApp ? (
+                `Welcome to ${appName} – your secure virtual data room for sharing documents.`
+              ) : (
+                `My name is Marc, and I'm the founder of Papermark – the secure way to share documents and data rooms. I'm excited to have you on board!`
+              )}
             </Text>
             <Text className="text-sm">
               Here are a few things you can do to get started:
