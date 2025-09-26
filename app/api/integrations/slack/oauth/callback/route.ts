@@ -39,18 +39,12 @@ export const GET = async (req: Request) => {
 
     // Find workspace that initiated the Stripe app install
     const stateKey = `slack:install:state:${state}`;
-
-    // Check if Redis is configured
-    if (!redis) {
-      return NextResponse.json({ error: "Redis not configured" }, { status: 500 });
-    }
-
-    const teamId = await redis.get<string>(stateKey);
+    const teamId = await redis!.get<string>(stateKey);
 
     if (!teamId) {
       return NextResponse.json({ error: "Invalid state" }, { status: 400 });
     }
-    await redis.del(stateKey);
+    await redis!.del(stateKey);
 
     team = await prisma.team.findUniqueOrThrow({
       where: {

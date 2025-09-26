@@ -7,16 +7,11 @@ import { getSlackEnv } from "./env";
 // Get the installation URL for Slack
 export const getSlackInstallationUrl = async (
   teamId: string,
-): Promise<string | null> => {
+): Promise<string> => {
   const env = getSlackEnv();
 
-  // Slack integration requires Redis for state management
-  if (!redis) {
-    return null;
-  }
-
   const state = nanoid(16);
-  await redis.set(`slack:install:state:${state}`, teamId, {
+  await redis!.set(`slack:install:state:${state}`, teamId, {
     ex: 30 * 60,
   });
 

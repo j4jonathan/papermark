@@ -65,6 +65,14 @@ export default async function handler(
   }
 
   try {
+    // If Redis is not configured, report feature is disabled
+    if (!redis) {
+      return res.status(503).json({
+        status: "error",
+        message: "Report feature is not available",
+      });
+    }
+
     // Create a unique Redis key to track reports for the documentId
     const reportKey = `report:doc_${documentId}`;
     const viewIdValue = `view_${viewId}`;
