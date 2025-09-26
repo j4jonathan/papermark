@@ -6,11 +6,13 @@ import { CreateUserEmailProps } from "../types";
 
 export const sendWelcomeEmail = async (params: CreateUserEmailProps) => {
   const { name, email } = params.user;
-  const emailTemplate = WelcomeEmail({ name });
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Papermark";
+  const isCustomApp = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true";
+  const emailTemplate = WelcomeEmail({ name, appName, isCustomApp });
   try {
     await sendEmail({
       to: email as string,
-      subject: "Welcome to Papermark!",
+      subject: `Welcome to ${appName}!`,
       react: emailTemplate,
       test: process.env.NODE_ENV === "development",
     });

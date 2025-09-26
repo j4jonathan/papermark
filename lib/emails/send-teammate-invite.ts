@@ -15,6 +15,8 @@ export const sendTeammateInviteEmail = async ({
   to: string;
   url: string;
 }) => {
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Papermark";
+
   try {
     await sendEmail({
       to: to,
@@ -24,6 +26,7 @@ export const sendTeammateInviteEmail = async ({
         senderEmail,
         teamName,
         url,
+        appName,
       }),
       test: process.env.NODE_ENV === "development",
       system: true,

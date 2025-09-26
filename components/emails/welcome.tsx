@@ -18,11 +18,11 @@ import { Footer } from "./shared/footer";
 
 interface WelcomeEmailProps {
   name: string | null | undefined;
+  appName?: string;
+  isCustomApp?: boolean;
 }
 
-const WelcomeEmail = ({ name }: WelcomeEmailProps) => {
-  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Papermark";
-  const isCustomApp = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true";
+const WelcomeEmail = ({ name, appName = "Papermark", isCustomApp = false }: WelcomeEmailProps) => {
   const previewText = `The document sharing infrastructure for the modern web`;
 
   return (

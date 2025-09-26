@@ -20,14 +20,14 @@ export default function TeamInvitation({
   senderEmail,
   teamName,
   url = "https://app.papermark.com",
+  appName = "Papermark",
 }: {
   senderName: string;
   senderEmail: string;
   teamName: string;
   url: string;
+  appName?: string;
 }) {
-  // Use custom app name for self-hosted deployments
-  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Papermark";
 
   return (
     <Html>
