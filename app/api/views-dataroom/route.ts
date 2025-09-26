@@ -7,6 +7,9 @@ import { ItemType, LinkAudienceType } from "@prisma/client";
 import { ipAddress, waitUntil } from "@vercel/functions";
 import { getServerSession } from "next-auth";
 
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+
 import { hashToken } from "@/lib/api/auth/token";
 import {
   DataroomSession,
