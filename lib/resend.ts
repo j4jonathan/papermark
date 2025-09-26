@@ -44,8 +44,14 @@ export const sendEmail = async ({
   const html = await render(react);
   const plainText = toPlainText(html);
 
+  // For self-hosted, use EMAIL_FROM env variable if set
+  const selfHostedFrom = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true" && process.env.EMAIL_FROM
+    ? process.env.EMAIL_FROM
+    : null;
+
   const fromAddress =
     from ??
+    selfHostedFrom ??
     (marketing
       ? "Marc from Papermark <marc@ship.papermark.io>"
       : system
@@ -61,7 +67,7 @@ export const sendEmail = async ({
       from: fromAddress,
       to: test ? "delivered@resend.dev" : to,
       cc: cc,
-      replyTo: marketing ? "marc@papermark.io" : replyTo,
+      replyTo: marketing ? (selfHostedFrom ?? "marc@papermark.io") : replyTo,
       subject,
       react,
       scheduledAt,
