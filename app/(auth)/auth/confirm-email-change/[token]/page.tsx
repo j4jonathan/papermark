@@ -136,18 +136,15 @@ const VerifyEmailChange = async ({ params: { token } }: PageProps) => {
 };
 
 const deleteRequest = async (tokenFound: VerificationToken) => {
-  const promises = [
-    prisma.verificationToken.delete({
-      where: {
-        token: tokenFound.token,
-      },
-    }),
-  ];
+  // Delete from database
+  await prisma.verificationToken.delete({
+    where: {
+      token: tokenFound.token,
+    },
+  });
 
-  // Only delete from Redis if it's configured
+  // Delete from Redis if it's configured
   if (redis) {
-    promises.push(redis.del(`email-change-request:user:${tokenFound.identifier}`));
+    await redis.del(`email-change-request:user:${tokenFound.identifier}`);
   }
-
-  await Promise.all(promises);
 };
