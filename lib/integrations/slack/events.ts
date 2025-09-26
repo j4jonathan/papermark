@@ -6,13 +6,23 @@ import { createSlackMessage } from "./templates";
 import { SlackEventData, SlackIntegrationServer } from "./types";
 
 export class SlackEventManager {
-  private client: SlackClient;
+  private client: SlackClient | null;
 
   constructor() {
-    this.client = new SlackClient();
+    try {
+      this.client = new SlackClient();
+    } catch (error) {
+      // Slack is not configured, which is fine for self-hosted deployments
+      this.client = null;
+    }
   }
 
   async processEvent(eventData: SlackEventData): Promise<void> {
+    if (!this.client) {
+      // Slack integration not configured
+      return;
+    }
+
     try {
       const env = getSlackEnv();
 
@@ -50,6 +60,11 @@ export class SlackEventManager {
     eventData: SlackEventData,
     integration: SlackIntegrationServer,
   ): Promise<void> {
+    if (!this.client) {
+      // Slack client not configured
+      return;
+    }
+
     try {
       const channels = await this.getNotificationChannels(
         eventData,
@@ -118,17 +133,29 @@ export class SlackEventManager {
   }
 }
 
-export const slackEventManager = new SlackEventManager();
+// Create a singleton instance, but handle configuration errors gracefully
+let slackEventManagerInstance: SlackEventManager | null = null;
+
+try {
+  slackEventManagerInstance = new SlackEventManager();
+} catch (error) {
+  // Slack integration not configured - this is fine for self-hosted
+  console.log("Slack integration not configured (missing SLACK_CLIENT_ID or SLACK_CLIENT_SECRET)");
+}
+
+export const slackEventManager = slackEventManagerInstance;
 
 export async function notifyDocumentView(
   data: Omit<SlackEventData, "eventType">,
 ) {
+  if (!slackEventManager) return;
   await slackEventManager.processEvent({ ...data, eventType: "document_view" });
 }
 
 export async function notifyDataroomAccess(
   data: Omit<SlackEventData, "eventType">,
 ) {
+  if (!slackEventManager) return;
   await slackEventManager.processEvent({
     ...data,
     eventType: "dataroom_access",
@@ -138,6 +165,7 @@ export async function notifyDataroomAccess(
 export async function notifyDocumentDownload(
   data: Omit<SlackEventData, "eventType">,
 ) {
+  if (!slackEventManager) return;
   await slackEventManager.processEvent({
     ...data,
     eventType: "document_download",
