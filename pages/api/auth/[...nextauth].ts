@@ -36,6 +36,7 @@ export const config = {
 };
 
 export const authOptions: NextAuthOptions = {
+  debug: process.env.NODE_ENV === "development" || process.env.NEXTAUTH_DEBUG === "true",
   pages: {
     error: "/login",
   },
@@ -199,7 +200,16 @@ const getAuthOptions = (req: NextApiRequest): NextAuthOptions => {
     ...authOptions,
     callbacks: {
       ...authOptions.callbacks,
-      signIn: async ({ user }) => {
+      signIn: async ({ user, account, profile }) => {
+        // Debug logging for OAuth
+        if (process.env.NEXTAUTH_DEBUG === "true") {
+          console.log("[NextAuth] SignIn attempt:", {
+            user: user?.email,
+            provider: account?.provider,
+            accountId: account?.providerAccountId,
+          });
+        }
+
         // Skip blacklist check for self-hosted instances
         if (!process.env.NEXT_PUBLIC_IS_SELF_HOSTED) {
           if (!user.email || (await isBlacklistedEmail(user.email))) {
@@ -231,9 +241,15 @@ const getAuthOptions = (req: NextApiRequest): NextAuthOptions => {
                 return false; // Block the signin
               }
             }
-          } catch (error) {}
+          } catch (error) {
+            console.error("[NextAuth] Rate limit check error:", error);
+          }
         }
 
+        // Debug successful sign in
+        if (process.env.NEXTAUTH_DEBUG === "true") {
+          console.log("[NextAuth] SignIn successful for:", user?.email);
+        }
         return true;
       },
     },
