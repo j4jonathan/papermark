@@ -38,6 +38,13 @@ export async function GET(req: Request) {
 
     const oauthUrl = await getSlackInstallationUrl(teamId);
 
+    if (!oauthUrl) {
+      return NextResponse.json(
+        { error: "Slack integration requires Redis configuration" },
+        { status: 503 },
+      );
+    }
+
     return NextResponse.json({
       oauthUrl,
     });
