@@ -57,13 +57,6 @@ export default async function handle(
           );
         }
         const token = randomBytes(32).toString("hex");
-        // Email change requires Redis for temporary storage
-        if (!redis) {
-          return res.status(503).json({
-            error: "Email change feature requires Redis configuration",
-          });
-        }
-
         const expiresIn = 15 * 60 * 1000;
 
         await prisma.verificationToken.create({
@@ -74,7 +67,7 @@ export default async function handle(
           },
         });
 
-        await redis.set(
+        await redis!.set(
           `email-change-request:user:${sessionUser.id}`,
           {
             email: sessionUser.email,

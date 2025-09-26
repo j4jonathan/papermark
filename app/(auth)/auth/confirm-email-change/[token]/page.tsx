@@ -82,21 +82,7 @@ const VerifyEmailChange = async ({ params: { token } }: PageProps) => {
 
   const currentUserId = (session.user as CustomUser).id;
 
-  // Email change requires Redis for temporary storage
-  if (!redis) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">Feature Not Available</h1>
-          <p className="mt-2 text-gray-600">
-            Email change confirmation requires Redis configuration.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  const data = await redis.get<{ email: string; newEmail: string }>(
+  const data = await redis!.get<{ email: string; newEmail: string }>(
     `email-change-request:user:${currentUserId}`,
   );
 
@@ -143,8 +129,6 @@ const deleteRequest = async (tokenFound: VerificationToken) => {
     },
   });
 
-  // Delete from Redis if it's configured
-  if (redis) {
-    await redis.del(`email-change-request:user:${tokenFound.identifier}`);
-  }
+  // Delete from Redis
+  await redis!.del(`email-change-request:user:${tokenFound.identifier}`);
 };

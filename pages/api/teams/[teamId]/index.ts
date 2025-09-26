@@ -227,8 +227,8 @@ export default async function handle(
             id: (session.user as CustomUser).id,
           },
         }),
-        // delete team branding from redis (if Redis is available)
-        redis && redis.del(`brand:logo:${teamId}`),
+        // delete team branding from redis
+        redis!.del(`brand:logo:${teamId}`),
 
         // delete team
         prisma.team.delete({

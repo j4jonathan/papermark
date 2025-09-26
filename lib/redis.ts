@@ -26,13 +26,8 @@ export const ratelimit = (
     | `${number} h`
     | `${number} d` = "10 s",
 ) => {
-  // Return null if Redis is not configured (for self-hosted without Redis)
-  if (!redis) {
-    return null;
-  }
-
   return new Ratelimit({
-    redis: redis,
+    redis: redis!,
     limiter: Ratelimit.slidingWindow(requests, seconds),
     analytics: true,
     prefix: "papermark",

@@ -65,20 +65,12 @@ export default async function handler(
   }
 
   try {
-    // If Redis is not configured, report feature is disabled
-    if (!redis) {
-      return res.status(503).json({
-        status: "error",
-        message: "Report feature is not available",
-      });
-    }
-
     // Create a unique Redis key to track reports for the documentId
     const reportKey = `report:doc_${documentId}`;
     const viewIdValue = `view_${viewId}`;
 
     // Check if the viewId has already reported for this documentId
-    const hasReported = await redis.sismember(reportKey, viewIdValue);
+    const hasReported = await redis!.sismember(reportKey, viewIdValue);
     if (hasReported) {
       return res.status(400).json({
         status: "error",
@@ -90,13 +82,13 @@ export default async function handler(
     waitUntil(
       Promise.all([
         // Add the viewId to the Redis set for this documentId
-        redis.sadd(reportKey, viewIdValue),
+        redis!.sadd(reportKey, viewIdValue),
 
         // Increment the report count for the documentId
-        redis.hincrby("reportCount", `doc_${documentId}`, 1),
+        redis!.hincrby("reportCount", `doc_${documentId}`, 1),
 
         // Store the abuse type report under a Redis hash for future analysis
-        redis.hset(`report:doc_${documentId}:details`, {
+        redis!.hset(`report:doc_${documentId}:details`, {
           [viewIdValue]: abuseType, // Store the abuseType as a number for this viewId
         }),
       ]),

@@ -18,13 +18,11 @@ async function fetchAndCacheDurations(
 ): Promise<Record<string, number>> {
   let durationsMap: Record<string, number> = {};
 
-  // Only use cache if Redis is available
-  if (redis) {
-    const cachedDurations = await redis.get(cacheKey);
-    if (cachedDurations) {
-      const parsedDurations = typeof cachedDurations === 'string' ? JSON.parse(cachedDurations) : cachedDurations;
-      return parsedDurations;
-    }
+  // Use cache from Redis
+  const cachedDurations = await redis!.get(cacheKey);
+  if (cachedDurations) {
+    const parsedDurations = typeof cachedDurations === 'string' ? JSON.parse(cachedDurations) : cachedDurations;
+    return parsedDurations;
   }
 
   // If not cached or Redis unavailable, fetch from Tinybird
@@ -58,10 +56,8 @@ async function fetchAndCacheDurations(
       });
     }
 
-    // Only cache if Redis is available
-    if (redis) {
-      await redis.set(cacheKey, JSON.stringify(durationsMap), { ex: 600 });
-    }
+    // Cache in Redis
+    await redis!.set(cacheKey, JSON.stringify(durationsMap), { ex: 600 });
   }
 
   return durationsMap;

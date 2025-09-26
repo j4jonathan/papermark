@@ -75,9 +75,9 @@ export default async function handle(
       },
     });
 
-    // Cache the logo URL in Redis if logo exists and Redis is available
-    if (logo && redis) {
-      await redis.set(`brand:logo:${teamId}`, logo);
+    // Cache the logo URL in Redis if logo exists
+    if (logo) {
+      await redis!.set(`brand:logo:${teamId}`, logo);
     }
 
     return res.status(200).json(brand);
@@ -100,14 +100,12 @@ export default async function handle(
       },
     });
 
-    // Update logo in Redis cache if Redis is available
-    if (redis) {
-      if (logo) {
-        await redis.set(`brand:logo:${teamId}`, logo);
-      } else {
-        // If logo is null or undefined, delete the cache
-        await redis.del(`brand:logo:${teamId}`);
-      }
+    // Update logo in Redis cache
+    if (logo) {
+      await redis!.set(`brand:logo:${teamId}`, logo);
+    } else {
+      // If logo is null or undefined, delete the cache
+      await redis!.del(`brand:logo:${teamId}`);
     }
 
     return res.status(200).json(brand);
@@ -132,10 +130,8 @@ export default async function handle(
       },
     });
 
-    // Remove logo from Redis cache if Redis is available
-    if (redis) {
-      await redis.del(`brand:logo:${teamId}`);
-    }
+    // Remove logo from Redis cache
+    await redis!.del(`brand:logo:${teamId}`);
 
     return res.status(204).end();
   } else {
