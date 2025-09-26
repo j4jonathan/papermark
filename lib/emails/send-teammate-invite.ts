@@ -29,6 +29,18 @@ export const sendTeammateInviteEmail = async ({
       system: true,
     });
   } catch (e) {
+    // For self-hosted without email configured, log the invitation URL
+    if (process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true") {
+      console.log("=== TEAM INVITATION (Email not configured) ===");
+      console.log(`To: ${to}`);
+      console.log(`Team: ${teamName}`);
+      console.log(`Invitation URL: ${url}`);
+      console.log("===============================================");
+      // Don't throw error for self-hosted without email
+      return;
+    }
     console.error(e);
+    // Rethrow for non-self-hosted to maintain existing behavior
+    throw e;
   }
 };
