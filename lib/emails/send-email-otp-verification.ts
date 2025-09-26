@@ -16,7 +16,7 @@ export const sendOtpVerificationEmail = async (
 
   const customEmail = await getCustomEmail(teamId);
 
-  if (customEmail && teamId) {
+  if (customEmail && teamId && redis) {
     from = customEmail;
     logo = await redis.get(`brand:logo:${teamId}`);
   }

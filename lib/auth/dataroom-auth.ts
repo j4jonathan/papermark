@@ -35,7 +35,7 @@ async function createDataroomSession(
   ipAddress: string,
   verified: boolean,
   viewerId?: string,
-): Promise<{ token: string; expiresAt: number }> {
+): Promise<{ token: string; expiresAt: number } | null> {
   const sessionToken = crypto.randomBytes(32).toString("hex");
   const expiresAt = Date.now() + COOKIE_EXPIRATION_TIME;
 
@@ -52,7 +52,11 @@ async function createDataroomSession(
   // Validate session data before storing
   DataroomSessionSchema.parse(sessionData);
 
-  // Store session in Redis
+  // Store session in Redis if available
+  if (!redis) {
+    return null; // Return null if Redis is not configured
+  }
+
   await redis.set(
     `dataroom_session:${sessionToken}`,
     JSON.stringify(sessionData),
@@ -75,6 +79,8 @@ async function verifyDataroomSession(
   const sessionToken = cookies().get(`pm_drs_${linkId}`)?.value;
   if (!sessionToken) return null;
 
+  if (!redis) return null; // Return null if Redis is not configured
+
   const session = await redis.get(`dataroom_session:${sessionToken}`);
   if (!session) return null;
 
@@ -83,14 +89,14 @@ async function verifyDataroomSession(
 
     // Check if session is expired
     if (sessionData.expiresAt < Date.now()) {
-      await redis.del(`dataroom_session:${sessionToken}`);
+      if (redis) await redis.del(`dataroom_session:${sessionToken}`);
       return null;
     }
 
     const ipAddressValue = ipAddress(request) ?? LOCALHOST_IP;
 
     if (ipAddressValue !== sessionData.ipAddress) {
-      await redis.del(`dataroom_session:${sessionToken}`);
+      if (redis) await redis.del(`dataroom_session:${sessionToken}`);
       return null;
     }
 
@@ -99,7 +105,7 @@ async function verifyDataroomSession(
       sessionData.linkId !== linkId ||
       sessionData.dataroomId !== dataroomId
     ) {
-      await redis.del(`dataroom_session:${sessionToken}`);
+      if (redis) await redis.del(`dataroom_session:${sessionToken}`);
       return null;
     }
 
@@ -107,7 +113,7 @@ async function verifyDataroomSession(
   } catch (error) {
     console.log("error", error);
     // If validation fails, delete invalid session and return null
-    await redis.del(`dataroom_session:${sessionToken}`);
+    if (redis) await redis.del(`dataroom_session:${sessionToken}`);
     return null;
   }
 }
@@ -124,6 +130,8 @@ export async function verifyDataroomSessionInPagesRouter(
   const sessionToken = cookies[`pm_drs_${linkId}`];
   if (!sessionToken) return null;
 
+  if (!redis) return null; // Return null if Redis is not configured
+
   const session = await redis.get(`dataroom_session:${sessionToken}`);
   if (!session) return null;
 
@@ -132,7 +140,7 @@ export async function verifyDataroomSessionInPagesRouter(
 
     // Check if session is expired
     if (sessionData.expiresAt < Date.now()) {
-      await redis.del(`dataroom_session:${sessionToken}`);
+      if (redis) await redis.del(`dataroom_session:${sessionToken}`);
       return null;
     }
 
@@ -140,7 +148,7 @@ export async function verifyDataroomSessionInPagesRouter(
     const ipAddressValue = getIpAddress(req.headers) ?? LOCALHOST_IP;
 
     if (ipAddressValue !== sessionData.ipAddress) {
-      await redis.del(`dataroom_session:${sessionToken}`);
+      if (redis) await redis.del(`dataroom_session:${sessionToken}`);
       return null;
     }
 
@@ -149,7 +157,7 @@ export async function verifyDataroomSessionInPagesRouter(
       sessionData.linkId !== linkId ||
       sessionData.dataroomId !== dataroomId
     ) {
-      await redis.del(`dataroom_session:${sessionToken}`);
+      if (redis) await redis.del(`dataroom_session:${sessionToken}`);
       return null;
     }
 
@@ -157,7 +165,7 @@ export async function verifyDataroomSessionInPagesRouter(
   } catch (error) {
     console.log("error", error);
     // If validation fails, delete invalid session and return null
-    await redis.del(`dataroom_session:${sessionToken}`);
+    if (redis) await redis.del(`dataroom_session:${sessionToken}`);
     return null;
   }
 }

@@ -17,12 +17,18 @@ async function fetchAndCacheDurations(
   cacheKey: string
 ): Promise<Record<string, number>> {
   let durationsMap: Record<string, number> = {};
-  const cachedDurations = await redis.get(cacheKey);
 
-  if (cachedDurations) {
-    const parsedDurations = typeof cachedDurations === 'string' ? JSON.parse(cachedDurations) : cachedDurations;
-    durationsMap = parsedDurations;
-  } else {
+  // Only use cache if Redis is available
+  if (redis) {
+    const cachedDurations = await redis.get(cacheKey);
+    if (cachedDurations) {
+      const parsedDurations = typeof cachedDurations === 'string' ? JSON.parse(cachedDurations) : cachedDurations;
+      return parsedDurations;
+    }
+  }
+
+  // If not cached or Redis unavailable, fetch from Tinybird
+  {
     const batchSize = 10; 
     for (let i = 0; i < groupedViews.length; i += batchSize) {
       const batch = groupedViews.slice(i, i + batchSize);
@@ -52,7 +58,10 @@ async function fetchAndCacheDurations(
       });
     }
 
-    await redis.set(cacheKey, JSON.stringify(durationsMap), { ex: 600 });
+    // Only cache if Redis is available
+    if (redis) {
+      await redis.set(cacheKey, JSON.stringify(durationsMap), { ex: 600 });
+    }
   }
 
   return durationsMap;
