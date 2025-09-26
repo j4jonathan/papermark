@@ -103,9 +103,9 @@ export function usePlan({
 
   // Parse the plan using the parsing function
   const parsedPlan = useMemo(() => {
-    // If self-hosted, return business plan with all features
+    // If self-hosted, return datarooms-plus plan with all features
     if (isSelfHosted) {
-      return { plan: "business" as BasePlan, trial: null, old: false };
+      return { plan: "datarooms-plus" as BasePlan, trial: null, old: false };
     }
     if (!plan || !plan.plan) {
       return { plan: null, trial: null, old: false };
