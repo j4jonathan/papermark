@@ -29,12 +29,8 @@ async function createPreviewSession(
   // Validate session data before storing
   ZPreviewSessionSchema.parse(sessionData);
 
-  // Store session in Redis if available
-  if (!redis) {
-    return null; // Return null if Redis is not configured
-  }
-
-  await redis.set(
+  // Store session in Redis
+  await redis!.set(
     `preview_session:${sessionToken}`,
     JSON.stringify(sessionData),
     { pxat: expiresAt },
@@ -54,9 +50,7 @@ async function verifyPreviewSession(
   const sessionToken = previewToken;
   if (!sessionToken) return null;
 
-  if (!redis) return null; // Return null if Redis is not configured
-
-  const session = await redis.get(`preview_session:${sessionToken}`);
+  const session = await redis!.get(`preview_session:${sessionToken}`);
   if (!session) return null;
 
   try {
@@ -64,26 +58,26 @@ async function verifyPreviewSession(
 
     // Check if the session is for the correct user
     if (sessionData.userId !== userId) {
-      if (redis) await redis.del(`preview_session:${sessionToken}`);
+      await redis!.del(`preview_session:${sessionToken}`);
       return null;
     }
 
     // Check if session is expired
     if (sessionData.expiresAt < Date.now()) {
-      if (redis) await redis.del(`preview_session:${sessionToken}`);
+      await redis!.del(`preview_session:${sessionToken}`);
       return null;
     }
 
     // Check if the session is for the correct link and dataroom
     if (sessionData.linkId !== linkId) {
-      if (redis) await redis.del(`preview_session:${sessionToken}`);
+      await redis!.del(`preview_session:${sessionToken}`);
       return null;
     }
 
     return sessionData;
   } catch (error) {
     console.error("Preview session verification error:", error);
-    if (redis) await redis.del(`preview_session:${sessionToken}`);
+    await redis!.del(`preview_session:${sessionToken}`);
     return null;
   }
 }
