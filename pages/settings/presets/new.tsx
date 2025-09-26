@@ -70,6 +70,9 @@ export default function NewPreset() {
     : false;
   const allowWatermarkOnBusiness = limits?.watermarkOnBusiness ?? false;
 
+  // Check if self-hosted mode is enabled
+  const isSelfHosted = process.env.NEXT_PUBLIC_IS_SELF_HOSTED === "true";
+
   const [openUpgradeModal, setOpenUpgradeModal] = useState<boolean>(false);
   const [trigger, setTrigger] = useState<string>("");
   const [upgradePlan, setUpgradePlan] = useState<PlanEnum>(PlanEnum.Business);
@@ -202,6 +205,7 @@ export default function NewPreset() {
                   data={data}
                   setData={setData}
                   isAllowed={
+                    isSelfHosted ||
                     isTrial ||
                     (isPro && allowAdvancedLinkControls) ||
                     isBusiness ||
@@ -221,6 +225,7 @@ export default function NewPreset() {
                   data={data}
                   setData={setData}
                   isAllowed={
+                    isSelfHosted ||
                     isTrial ||
                     (isPro && allowAdvancedLinkControls) ||
                     isBusiness ||
@@ -241,6 +246,7 @@ export default function NewPreset() {
                   data={data}
                   setData={setData}
                   isAllowed={
+                    isSelfHosted ||
                     isTrial ||
                     (isPro && allowAdvancedLinkControls) ||
                     isBusiness ||
@@ -254,6 +260,7 @@ export default function NewPreset() {
                   data={data}
                   setData={setData}
                   isAllowed={
+                    isSelfHosted ||
                     isTrial ||
                     (isPro && allowAdvancedLinkControls) ||
                     isBusiness ||
@@ -273,6 +280,7 @@ export default function NewPreset() {
                   data={data}
                   setData={setData}
                   isAllowed={
+                    isSelfHosted ||
                     isTrial ||
                     isDatarooms ||
                     isDataroomsPlus ||
@@ -285,6 +293,7 @@ export default function NewPreset() {
                   data={data}
                   setData={setData}
                   isAllowed={
+                    isSelfHosted ||
                     isTrial ||
                     (isPro && allowAdvancedLinkControls) ||
                     isBusiness ||
@@ -296,13 +305,14 @@ export default function NewPreset() {
                 <AgreementSection
                   data={data}
                   setData={setData}
-                  isAllowed={isTrial || isDatarooms || isDataroomsPlus}
+                  isAllowed={isSelfHosted || isTrial || isDatarooms || isDataroomsPlus}
                   handleUpgradeStateChange={handleUpgradeStateChange}
                 />
                 <CustomFieldsSection
                   data={data}
                   setData={setData}
                   isAllowed={
+                    isSelfHosted ||
                     isTrial ||
                     (isPro && allowAdvancedLinkControls) ||
                     isBusiness ||
