@@ -1,3 +1,7 @@
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { processDocument } from "@/lib/api/documents/process-document";
@@ -5,10 +9,6 @@ import { verifyDataroomSession } from "@/lib/auth/dataroom-auth";
 import { DocumentData } from "@/lib/documents/create-document";
 import prisma from "@/lib/prisma";
 import { supportsAdvancedExcelMode } from "@/lib/utils/get-content-type";
-
-// Force dynamic rendering for this route
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
 
 export async function POST(
   request: NextRequest,

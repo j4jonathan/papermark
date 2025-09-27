@@ -1,3 +1,7 @@
+// Force dynamic rendering as this route uses authentication
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 import { NextResponse } from "next/server";
 
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
@@ -8,10 +12,6 @@ import { getSlackInstallationUrl } from "@/lib/integrations/slack/install";
 import prisma from "@/lib/prisma";
 import { CustomUser } from "@/lib/types";
 import { getSearchParams } from "@/lib/utils/get-search-params";
-
-// Force dynamic rendering as this route uses authentication
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
 
 const oAuthAuthorizeSchema = z.object({
   teamId: z.string().cuid(),

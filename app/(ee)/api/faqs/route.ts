@@ -1,13 +1,13 @@
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from "next/server";
 
 import { z } from "zod";
 
 import { verifyDataroomSession } from "@/lib/auth/dataroom-auth";
 import prisma from "@/lib/prisma";
-
-// Force dynamic rendering for this route
-export const dynamic = 'force-dynamic';
-export const runtime = 'nodejs';
 
 // Validation schema for query parameters
 const visitorFAQParamsSchema = z.object({
