@@ -9,6 +9,7 @@ import { getServerSession } from "next-auth";
 
 // Force dynamic rendering for this route
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 import { hashToken } from "@/lib/api/auth/token";
 import { verifyPreviewSession } from "@/lib/auth/preview-auth";

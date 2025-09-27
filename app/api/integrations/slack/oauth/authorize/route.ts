@@ -11,6 +11,7 @@ import { getSearchParams } from "@/lib/utils/get-search-params";
 
 // Force dynamic rendering as this route uses authentication
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const oAuthAuthorizeSchema = z.object({
   teamId: z.string().cuid(),
