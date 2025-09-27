@@ -37,7 +37,7 @@ export const GET = async (req: Request) => {
 
     const { code, state } = oAuthCallbackSchema.parse(getSearchParams(req.url));
 
-    // Find workspace that initiated the Stripe app install
+    // Find workspace that initiated the Slack app install
     const stateKey = `slack:install:state:${state}`;
     const teamId = await redis!.get<string>(stateKey);
 
