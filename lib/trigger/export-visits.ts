@@ -301,7 +301,7 @@ async function exportDocumentVisits(
           viewId: view.id,
           since: 0,
         }),
-      ),
+      ) as Promise<{ data: { pageNumber: string; sum_duration: number }[]; meta: any }>,
       tinybirdLimiter.schedule(async () => {
         const result = await getViewUserAgent({
           viewId: view.id,
@@ -606,7 +606,7 @@ async function exportDataroomVisits(
           viewId: docView.id,
           since: 0,
         }),
-      );
+      ) as { data: { pageNumber: string; sum_duration: number }[]; meta: any };
 
       const relevantVersion = docView.document?.versions.find(
         (version) => version.createdAt <= docView.viewedAt,

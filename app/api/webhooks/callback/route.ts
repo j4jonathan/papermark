@@ -1,3 +1,7 @@
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 import { z } from "zod";
 
 import { verifyQstashSignature } from "@/lib/cron/verify-qstash";

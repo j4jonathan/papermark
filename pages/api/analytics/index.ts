@@ -550,7 +550,7 @@ export default async function handler(
                 if (pageData.data && pageData.data.length > 0) {
                   // Calculate total duration from all pages
                   totalDuration = pageData.data.reduce(
-                    (sum, page) => sum + page.sum_duration,
+                    (sum: number, page: any) => sum + page.sum_duration,
                     0,
                   );
 

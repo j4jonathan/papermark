@@ -22,9 +22,18 @@ const FRAUD_DECLINE_CODES = [
  */
 export async function addEmailToStripeRadar(email: string): Promise<boolean> {
   try {
+    // Skip if Stripe list ID is not configured (self-hosted deployments)
+    if (!process.env.STRIPE_LIST_ID) {
+      log({
+        message: `Skipping Stripe Radar - STRIPE_LIST_ID not configured`,
+        type: "info",
+      });
+      return false;
+    }
+
     const stripeClient = stripeInstance();
     await stripeClient.radar.valueListItems.create({
-      value_list: process.env.STRIPE_LIST_ID!,
+      value_list: process.env.STRIPE_LIST_ID,
       value: email,
     });
 

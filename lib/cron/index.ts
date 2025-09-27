@@ -14,6 +14,20 @@ export const receiver = new Receiver({
   nextSigningKey: process.env.QSTASH_NEXT_SIGNING_KEY || "",
 });
 
-export const qstash = new Client({
-  token: process.env.QSTASH_TOKEN || "",
-});
+// Create a conditional qstash client - only if token is available
+// For self-hosted deployments without QStash, this returns a stub
+export const qstash = process.env.QSTASH_TOKEN
+  ? new Client({
+      token: process.env.QSTASH_TOKEN,
+    })
+  : ({
+      // Stub methods that log a warning and do nothing
+      publishJSON: async () => {
+        console.warn("[QStash] Skipping webhook - QSTASH_TOKEN not configured");
+        return { messageId: "stub" };
+      },
+      publish: async () => {
+        console.warn("[QStash] Skipping message - QSTASH_TOKEN not configured");
+        return { messageId: "stub" };
+      },
+    } as any);

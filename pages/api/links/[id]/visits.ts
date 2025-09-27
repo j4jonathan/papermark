@@ -106,9 +106,9 @@ export default async function handle(
       const durations = await Promise.all(durationsPromises);
 
       // Sum up durations for each view
-      const summedDurations = durations.map((duration) => {
+      const summedDurations = durations.map((duration: any) => {
         return duration.data.reduce(
-          (totalDuration, data) => totalDuration + data.sum_duration,
+          (totalDuration: number, data: any) => totalDuration + data.sum_duration,
           0,
         );
       });

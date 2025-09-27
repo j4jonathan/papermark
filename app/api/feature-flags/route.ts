@@ -1,8 +1,10 @@
+// Force dynamic rendering for this route
+export const dynamic = 'force-dynamic';
+export const runtime = "edge";
+
 import { NextResponse } from "next/server";
 
 import { getFeatureFlags } from "@/lib/featureFlags";
-
-export const runtime = "edge";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
